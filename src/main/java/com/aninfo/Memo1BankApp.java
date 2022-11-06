@@ -1,7 +1,9 @@
 package com.aninfo;
 
 import com.aninfo.model.Account;
+import com.aninfo.model.Transaction;
 import com.aninfo.service.AccountService;
+import com.aninfo.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -26,6 +29,9 @@ public class Memo1BankApp {
 
 	@Autowired
 	private AccountService accountService;
+
+	@Autowired
+	private TransactionService transactionService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Memo1BankApp.class, args);
@@ -74,6 +80,29 @@ public class Memo1BankApp {
 	public Account deposit(@PathVariable Long cbu, @RequestParam Double sum) {
 		return accountService.deposit(cbu, sum);
 	}
+
+	@GetMapping("/transactions/{id}")
+	public ResponseEntity<Transaction> getTransactionById(@RequestParam Long id){
+		Optional<Transaction> transactionOptional = transactionService.findByid(id);
+		return ResponseEntity.of(transactionOptional);
+	}
+
+	@GetMapping("/transactions")
+	public List<Transaction> getAll(){
+		return transactionService.findAll();
+	}
+
+	@GetMapping("/transactions/{cbu}")
+	public List<Transaction> getTransactionByCbu(@RequestParam Long cbu){
+		return transactionService.getTransactionsByCbu(cbu);
+	}
+
+	@DeleteMapping("/transactions/{id}")
+	public void deleteTransactionById(@RequestParam Long id){
+		transactionService.deleteById(id);
+
+	}
+
 
 	@Bean
 	public Docket apiDocket() {

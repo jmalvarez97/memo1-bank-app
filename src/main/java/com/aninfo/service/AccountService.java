@@ -4,6 +4,7 @@ import com.aninfo.exceptions.DepositNegativeSumException;
 import com.aninfo.exceptions.InsufficientFundsException;
 import com.aninfo.model.Account;
 import com.aninfo.repository.AccountRepository;
+import com.aninfo.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,9 @@ public class AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private TransactionService transactionService;
 
     public Account createAccount(Account account) {
         return accountRepository.save(account);
@@ -45,6 +49,8 @@ public class AccountService {
             throw new InsufficientFundsException("Insufficient funds");
         }
 
+        transactionService.createTransaction(cbu, sum, "W");
+
         account.setBalance(account.getBalance() - sum);
         accountRepository.save(account);
 
@@ -54,9 +60,26 @@ public class AccountService {
     @Transactional
     public Account deposit(Long cbu, Double sum) {
 
+        int maxRefund = 500;
+        int minAmountPromo = 2000;
+        double percent = 0.1;
+
         if (sum <= 0) {
             throw new DepositNegativeSumException("Cannot deposit negative sums");
         }
+
+        if (sum >= minAmountPromo){
+            double extra = sum * percent;
+            if (extra < maxRefund){
+                sum+=extra;
+            }
+            else {
+                sum+=maxRefund;
+            }
+        }
+
+        transactionService.createTransaction(cbu, sum, "D");
+
 
         Account account = accountRepository.findAccountByCbu(cbu);
         account.setBalance(account.getBalance() + sum);
