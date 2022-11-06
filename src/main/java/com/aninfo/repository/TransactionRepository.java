@@ -10,9 +10,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource
 public interface TransactionRepository extends CrudRepository<Transaction, Long> {
 
-    @Override
-    List<Transaction> findAll();
-
     List<Transaction> findTransactionByCbu(Long _cbu);
 
 }

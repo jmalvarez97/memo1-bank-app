@@ -87,11 +87,6 @@ public class Memo1BankApp {
 		return ResponseEntity.of(transactionOptional);
 	}
 
-	@GetMapping("/transactions")
-	public List<Transaction> getAll(){
-		return transactionService.findAll();
-	}
-
 	@GetMapping("/transactions/{cbu}")
 	public List<Transaction> getTransactionByCbu(@RequestParam Long cbu){
 		return transactionService.getTransactionsByCbu(cbu);
